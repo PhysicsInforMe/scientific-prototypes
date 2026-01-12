@@ -51,7 +51,7 @@ Source code for proprietary implementations is available upon request for:
 
 ## 👤 Author
 
-**Luigi Simeone** — AI Consultant specializing in agentic systems, governance, and enterprise implementation.
+**Luigi Simeone** — Fractional CTO, Senior Researcher & Tech Advisor.
 
 - [Website](https://luigisimeone.com)
 - [LinkedIn](www.linkedin.com/in/luigi-simeone-2a688150)
