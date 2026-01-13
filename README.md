@@ -33,7 +33,7 @@ In-depth whitepapers on AI strategy and implementation:
 - **Multi-Agent System Architectures** — Design patterns for enterprise AI (A2A, MCP, memory systems)
 - **Local-First AI Agents** — Hardware requirements, model selection, production deployment
 
-**[→ Access Whitepapers](https://luigisimeone.com/#insights)**
+**[→ Free Access Whitepapers](TBD)**
 
 ---
 
@@ -45,7 +45,7 @@ Source code for proprietary implementations is available upon request for:
 - Academic research collaborations
 - Consulting and implementation projects
 
-**[→ Request Access](https://luigisimeone.com/#projects)**
+**[→ Free Request Access](TBD)**
 
 ---
 
@@ -53,7 +53,7 @@ Source code for proprietary implementations is available upon request for:
 
 **Luigi Simeone** — Fractional CTO, Senior Researcher & Tech Advisor.
 
-- [Website](https://luigisimeone.com)
+- [Website](TBD)
 - [LinkedIn](https://www.linkedin.com/in/luigi-simeone-2a688150/)
 
 ---
