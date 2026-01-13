@@ -54,7 +54,7 @@ Source code for proprietary implementations is available upon request for:
 **Luigi Simeone** — Fractional CTO, Senior Researcher & Tech Advisor.
 
 - [Website](https://luigisimeone.com)
-- [LinkedIn](www.linkedin.com/in/luigi-simeone-2a688150)
+- [LinkedIn](https://www.linkedin.com/in/luigi-simeone-2a688150/)
 
 ---
 
