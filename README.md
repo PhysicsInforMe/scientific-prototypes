@@ -308,7 +308,7 @@ This repository contains proprietary implementation code. Source code access is 
 
 **Documentation**: MIT License
 
-**Source Code**: Proprietary — Available upon approved request
+**Source Code**: Proprietary — Available upon approved request through my website
 
 ---
 
