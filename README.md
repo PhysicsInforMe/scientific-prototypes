@@ -42,10 +42,12 @@ Source code for proprietary implementations is available upon request for:
 
 ---
 
-## 👤 Author 
-**Luigi Simeone** — Fractional CTO, Senior Researcher & Tech Advisor.
-- [Website](TBD)
-- [LinkedIn](https://www.linkedin.com/in/luigi-simeone-2a688150/)
+## About the Author
+
+**Luigi Simeone** is an AI Consultant and Chief Scientist specializing in agentic AI systems, multi-agent architectures, and enterprise AI governance. With 12+ years of experience in AI innovation across FinTech, Asset Management, and RegTech, he bridges theoretical research with practical enterprise implementation.
+
+- **Website**: [luigisimeone.com](https://luigisimeone.com)
+- **LinkedIn**: [linkedin.com/in/luigi-simeone](https://linkedin.com/in/luigi-simeone)
 
 ---
 
