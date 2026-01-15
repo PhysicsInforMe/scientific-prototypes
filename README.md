@@ -1,6 +1,6 @@
 # Scientific Prototypes
 
-A collection of experimental AI prototypes and proof-of-concept implementations showcasing advanced math and machine learning modelling, agentic AI patterns, local-first architectures, and enterprise-grade compliance frameworks.
+A collection of experimental AI prototypes and proof-of-concept implementations showcasing advanced math and machine learning modelling, agentic AI prototypes, local-first architectures, and enterprise-grade compliance frameworks.
 
 > **Note**: This repository contains documentation and technical specifications. Source code for select projects is available upon request.
 
