@@ -283,7 +283,7 @@ This repository contains proprietary implementation code. Source code access is 
 
 ## About the Author
 
-**Luigi Simeone** is an AI Consultant and Chief Scientist specializing in agentic AI systems, multi-agent architectures, and enterprise AI governance. With 12+ years of experience in AI innovation across FinTech, Asset Management, and RegTech, he bridges theoretical research with practical enterprise implementation.
+**Luigi Simeone** is an AI Consultant and Chief Scientist specializing in mathematical modelling, machine learning, multi-agent architectures, and enterprise AI governance. With 12+ years of experience in AI innovation across AI Consulting, FinTech, Asset Management, and RegTech, he bridges theoretical research with practical enterprise implementation.
 
 - **Website**: [luigisimeone.com](https://luigisimeone.com)
 - **LinkedIn**: [linkedin.com/in/luigi-simeone](https://linkedin.com/in/luigi-simeone)
