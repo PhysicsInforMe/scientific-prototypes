@@ -17,7 +17,7 @@ An **Adaptive AutoML Framework** for financial time series analysis with automat
 - Explainable reports in Markdown format
 - Data sources: Crypto, Equities, Rates, Liquidity, Volatility, Macro (via free APIs)
 
-**Status:** Complete (311 tests passing)
+**Status:** In development (311 tests passing)
 
 [View Project](./timeseries-toolkit/)
 
@@ -32,7 +32,7 @@ An AI-powered agent for analyzing contracts and identifying unfair clauses, desi
 - Unfair clause detection
 - Consumer-focused interface
 
-**Status:** In Development
+**Status:** Complete
 
 [View Project](./contract-compliance-agent/)
 
