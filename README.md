@@ -4,7 +4,7 @@ A collection of applied research prototypes demonstrating practical applications
 
 ## Projects
 
-### 1. [Timeseries Toolkit](./timeseries-toolkit/)
+### 1. [Adaptive AutoML Framework](./adaptive-automl-framework/)
 
 An **Adaptive AutoML Framework** for financial time series analysis with automatic regime detection, pipeline selection, and explainable forecasting.
 
@@ -19,7 +19,7 @@ An **Adaptive AutoML Framework** for financial time series analysis with automat
 
 **Status:** In development (311 tests passing)
 
-[View Project](./timeseries-toolkit/)
+[View Project](./adaptive-automl-framework/)
 
 ---
 
