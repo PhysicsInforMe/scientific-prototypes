@@ -154,24 +154,30 @@ class Pipeline:
         if not self._fitted or self._model_step is None:
             raise RuntimeError("Pipeline must be fitted before predicting.")
 
-        # --- Generate point forecast --------------------------------------
+        # --- Generate forecast with confidence bands -----------------------
         if isinstance(self._model_step, AutoKalmanFilter):
-            fc = self._model_step.forecast(steps=horizon)
+            # Use native state-space forecast intervals when available.
+            # These properly account for state estimation uncertainty,
+            # observation noise, and horizon-dependent uncertainty growth.
+            try:
+                fc, fc_lower, fc_upper = self._model_step.forecast_with_ci(
+                    steps=horizon, confidence_level=confidence_level
+                )
+                forecast_vals = fc.values if isinstance(fc, pd.Series) else np.asarray(fc)
+                lower = fc_lower.values if isinstance(fc_lower, pd.Series) else np.asarray(fc_lower)
+                upper = fc_upper.values if isinstance(fc_upper, pd.Series) else np.asarray(fc_upper)
+            except Exception:
+                # Fallback to residual-based CI if native CI fails.
+                fc = self._model_step.forecast(steps=horizon)
+                forecast_vals = fc.values if isinstance(fc, pd.Series) else np.asarray(fc)
+                z = sp_stats.norm.ppf(0.5 + confidence_level / 2.0)
+                resid_std = float(np.nanstd(self._residuals)) if self._residuals is not None else 0.0
+                steps_ahead = np.arange(1, horizon + 1, dtype=float)
+                band_width = z * resid_std * np.sqrt(steps_ahead)
+                lower = forecast_vals - band_width
+                upper = forecast_vals + band_width
         else:
             raise ValueError(f"Unsupported model type: {type(self._model_step)}")
-
-        # --- Confidence bands from residual std ---------------------------
-        # Use Gaussian quantile scaled by sqrt(h) for growing uncertainty.
-        z = sp_stats.norm.ppf(0.5 + confidence_level / 2.0)
-        resid_std = float(np.nanstd(self._residuals)) if self._residuals is not None else 0.0
-
-        steps_ahead = np.arange(1, horizon + 1, dtype=float)
-        # Uncertainty grows with square root of horizon (random-walk assumption).
-        band_width = z * resid_std * np.sqrt(steps_ahead)
-
-        forecast_vals = fc.values if isinstance(fc, pd.Series) else np.asarray(fc)
-        lower = forecast_vals - band_width
-        upper = forecast_vals + band_width
 
         # Build DatetimeIndex for forecast period.
         if isinstance(fc, pd.Series) and isinstance(fc.index, pd.DatetimeIndex):
@@ -295,7 +301,7 @@ class PipelineRegistry:
             name="aggressive",
             steps=[
                 ("fracdiff", None),  # placeholder; Pipeline.fit handles it
-                ("model", AutoKalmanFilter(level="local level")),
+                ("model", AutoKalmanFilter(level="local linear trend")),
             ],
         )
 

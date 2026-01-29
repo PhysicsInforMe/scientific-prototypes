@@ -184,6 +184,41 @@ class AutoKalmanFilter:
 
         return forecast
 
+    def forecast_with_ci(
+        self, steps: int, confidence_level: float = 0.95
+    ) -> Tuple[pd.Series, pd.Series, pd.Series]:
+        """
+        Generate out-of-sample forecasts with native confidence intervals.
+
+        Uses statsmodels' state-space forecast covariance to produce
+        properly calibrated prediction intervals that account for state
+        estimation uncertainty, observation noise, and horizon growth.
+
+        Args:
+            steps: Number of periods to forecast.
+            confidence_level: Confidence level for intervals (default 0.95).
+
+        Returns:
+            Tuple of (forecast, lower, upper) as pd.Series.
+
+        Raises:
+            ValueError: If model has not been fitted.
+        """
+        if not self.is_fitted:
+            raise ValueError("Model must be fitted before forecasting")
+
+        alpha = 1.0 - confidence_level
+        forecast_result = self.results.get_forecast(steps=steps)
+        forecast_std = forecast_result.predicted_mean
+        ci = forecast_result.conf_int(alpha=alpha)
+
+        # Reverse standardization on all three
+        forecast = forecast_std * self._scaler_std + self._scaler_mean
+        lower = ci.iloc[:, 0] * self._scaler_std + self._scaler_mean
+        upper = ci.iloc[:, 1] * self._scaler_std + self._scaler_mean
+
+        return forecast, lower, upper
+
     def predict(
         self,
         start: Optional[pd.Timestamp] = None,
