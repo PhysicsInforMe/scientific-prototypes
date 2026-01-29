@@ -21,6 +21,14 @@ timeseries_toolkit/
 │   ├── __init__.py
 │   ├── causality.py         # CCM and Granger causality tests
 │   └── diagnostics.py       # Forensic ensemble analyzer
+├── intelligence/            # Market intelligence system
+│   ├── __init__.py
+│   ├── market_intelligence.py  # Main orchestrator
+│   ├── regime_analyzer.py      # Layer 1: Regime detection
+│   ├── autopilot.py            # Layer 2: Pipeline selection
+│   ├── explainer.py            # Layer 3: Report generation
+│   ├── pipelines.py            # Pipeline configurations
+│   └── backtester.py           # Walk-forward backtesting
 └── utils/                   # Utility functions
     ├── __init__.py
     └── data_loader.py       # CSV/Excel data loading

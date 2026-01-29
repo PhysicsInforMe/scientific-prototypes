@@ -111,6 +111,28 @@ report = analyzer.run_full_analysis()
 print(report)
 ```
 
+### Market Intelligence
+
+```python
+from timeseries_toolkit.intelligence import MarketIntelligence
+
+mi = MarketIntelligence()
+
+# Full analysis with regime detection and forecast
+report = mi.analyze(["BTC-USD"], horizon="7D")
+print(report.summary)
+
+# Quick forecast
+fc = mi.quick_forecast("SPY", horizon="7D")
+
+# Regime detection only
+regime = mi.get_regime(["SPY"])
+print(f"Regime: {regime.current_regime} ({regime.confidence:.0%})")
+
+# Export as Markdown
+report.save_markdown("analysis.md")
+```
+
 ## Module Structure
 
 ```
@@ -126,6 +148,15 @@ timeseries_toolkit/
 ├── validation/
 │   ├── diagnostics.py      # Forensic analysis
 │   └── causality.py        # Causality tests
+├── intelligence/
+│   ├── market_intelligence.py  # Unified orchestrator
+│   ├── regime_analyzer.py      # Regime detection wrapper
+│   ├── autopilot.py            # Automatic pipeline selection
+│   ├── explainer.py            # Report generation
+│   ├── pipelines.py            # Pipeline configurations
+│   └── backtester.py           # Walk-forward backtesting
+├── data_sources/
+│   └── (7 data loader modules + DataHub)
 └── utils/
     └── data_loader.py      # Data loading utilities
 ```
@@ -133,6 +164,7 @@ timeseries_toolkit/
 ## Documentation
 
 - [Technical Documentation](../docs/TECHNICAL.md) - Mathematical foundations, API reference, and usage examples
+- [User Guide](../docs/USER_GUIDE.md) - MarketIntelligence usage guide
 
 ## Test Coverage
 
