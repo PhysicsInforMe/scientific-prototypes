@@ -1,3 +1,15 @@
+# Claude Code instruction files - do not commit
+CLAUDE.md
+DOCUMENTATION.md
+TESTING.md
+DATASOURCES.md
+MARKET_INTELLIGENCE.md
+FRED_SETUP.md
+PROJECT_STATUS.md
+EXPLORATION_GUIDE.md
+REORGANIZE.md
+.claude/
+
 # Data files - do not commit
 data/
 *.csv

@@ -163,8 +163,8 @@ timeseries_toolkit/
 
 ## Documentation
 
-- [Technical Documentation](../docs/TECHNICAL.md) - Mathematical foundations, API reference, and usage examples
-- [User Guide](../docs/USER_GUIDE.md) - MarketIntelligence usage guide
+- [Technical Documentation](docs/TECHNICAL.md) - Mathematical foundations, API reference, and usage examples
+- [User Guide](docs/USER_GUIDE.md) - MarketIntelligence usage guide
 
 ## Test Coverage
 
