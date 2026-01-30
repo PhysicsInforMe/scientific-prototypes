@@ -158,7 +158,10 @@ Quality: HIGH (4/4 diagnostics pass)
 - **Wide bands** → high uncertainty; volatile or crisis regime.
 - **95% confidence** means: in 95 out of 100 similar situations, the actual
   value should fall within these bands.
-- Bands widen over longer horizons (uncertainty grows with √time).
+- Bands widen over longer horizons as the state-space forecast covariance
+  grows with the prediction horizon. The system uses statsmodels' native
+  forecast intervals, which account for state estimation uncertainty,
+  observation noise, and horizon growth.
 
 ### Quality Score Breakdown
 

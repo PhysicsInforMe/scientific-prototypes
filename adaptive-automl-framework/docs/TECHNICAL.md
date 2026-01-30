@@ -252,6 +252,15 @@ model = UnobservedComponents(
 )
 ```
 
+#### Forecast Confidence Intervals
+
+The `forecast_with_ci()` method produces prediction intervals via statsmodels' native state-space forecast covariance, which accounts for:
+- State estimation uncertainty
+- Observation noise
+- Forecast horizon uncertainty growth
+
+This replaces the earlier residual-based approach (`z × resid_std × √h`) which underestimates uncertainty because in-sample smoothing residuals are smaller than true forecast errors. The Market Intelligence pipelines use `forecast_with_ci()` automatically when the model is an `AutoKalmanFilter`.
+
 #### Comparison with ARIMA
 
 | Aspect | Kalman Filter | ARIMA |
@@ -583,8 +592,11 @@ Wrapper for statsmodels UnobservedComponents.
 **Methods:**
 - `fit(series)`: Fit state-space model
 - `smooth()`: Kalman smoothing
-- `forecast(steps)`: Out-of-sample forecast
+- `forecast(steps)`: Out-of-sample point forecast
+- `forecast_with_ci(steps, confidence_level=0.95)`: Forecast with native confidence intervals using statsmodels' state-space forecast covariance. Returns `(forecast, lower, upper)` as pd.Series tuple.
+- `predict(start, end)`: In-sample and out-of-sample predictions
 - `get_components()`: Extract trend, seasonal, etc.
+- `get_residuals()`: Model residuals
 
 ### models.regime
 
