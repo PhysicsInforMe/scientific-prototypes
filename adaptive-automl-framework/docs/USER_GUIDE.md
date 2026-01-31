@@ -36,7 +36,7 @@ This will:
 ## 2. Installation and Setup
 
 ### Requirements
-- Python 3.8+
+- Python 3.9+
 - Dependencies installed via `pip install -e .`
 
 ### API Keys

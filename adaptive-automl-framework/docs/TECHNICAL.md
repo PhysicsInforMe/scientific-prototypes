@@ -29,6 +29,16 @@ timeseries_toolkit/
 │   ├── explainer.py            # Layer 3: Report generation
 │   ├── pipelines.py            # Pipeline configurations
 │   └── backtester.py           # Walk-forward backtesting
+├── data_sources/            # Live market data fetchers
+│   ├── __init__.py
+│   ├── crypto.py            # CryptoDataLoader (Yahoo Finance)
+│   ├── equities.py          # EquityDataLoader (Yahoo Finance)
+│   ├── volatility.py        # VolatilityDataLoader (VIX)
+│   ├── rates.py             # RatesDataLoader (FRED)
+│   ├── macro.py             # MacroDataLoader (FRED)
+│   ├── liquidity.py         # LiquidityDataLoader (FRED)
+│   ├── european.py          # EuropeanDataLoader (FRED)
+│   └── data_hub.py          # Unified DataHub interface
 └── utils/                   # Utility functions
     ├── __init__.py
     └── data_loader.py       # CSV/Excel data loading
@@ -90,6 +100,13 @@ timeseries_toolkit/
 4. **Validation Stage**:
    - `causality`: Test causal relationships
    - `diagnostics`: Comprehensive model validation
+5. **Intelligence Stage** (orchestration layer):
+   - `market_intelligence`: Unified orchestrator combining all stages
+   - `regime_analyzer`: HMM regime detection with named regimes
+   - `autopilot`: Data-driven pipeline selection
+   - `pipelines`: Pre-configured analysis pipelines (conservative, aggressive)
+   - `explainer`: Natural-language report generation
+   - `backtester`: Walk-forward out-of-sample evaluation
 
 ---
 

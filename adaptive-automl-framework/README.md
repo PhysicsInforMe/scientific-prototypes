@@ -165,22 +165,27 @@ timeseries_toolkit/
 
 - [Technical Documentation](docs/TECHNICAL.md) - Mathematical foundations, API reference, and usage examples
 - [User Guide](docs/USER_GUIDE.md) - MarketIntelligence usage guide
+- [Result Interpretation](docs/result_interpretation.md) - Analysis of forecast performance vs naive baselines and proposed improvements
 
 ## Test Coverage
 
-| Module | Tests | Description |
-|--------|-------|-------------|
-| fractional_diff | 18 | FFD stationarity transformation |
-| filtering | 24 | STL + SARIMA filtering |
-| imputation | 18 | MICE mixed-frequency imputation |
-| kalman | 31 | State-space models |
-| regime | 17 | HMM regime detection |
-| forecaster | 23 | LightGBM global forecasting |
-| causality | 40 | CCM + Granger tests |
-| diagnostics | 26 | 7-test forensic analysis |
-| utils | 21 | Data loading utilities |
-| scientific | 17 | Mathematical validity tests |
-| **Total** | **242** | **All passing** |
+| Module | Test File | Description |
+|--------|-----------|-------------|
+| fractional_diff | test_fractional_diff.py | FFD stationarity transformation |
+| filtering | test_filtering.py | STL + SARIMA filtering |
+| imputation | test_imputation.py | MICE mixed-frequency imputation |
+| kalman | test_kalman.py | State-space models |
+| regime | test_regime.py | HMM regime detection |
+| forecaster | test_forecaster.py | LightGBM global forecasting |
+| causality | test_causality.py | CCM + Granger tests |
+| diagnostics | test_diagnostics.py | 7-test forensic analysis |
+| utils | test_utils.py | Data loading utilities |
+| data_sources | test_data_sources.py | Yahoo Finance + FRED loaders |
+| intelligence | test_intelligence.py | MarketIntelligence orchestrator |
+| integration | test_intelligence_integration.py | End-to-end pipeline tests |
+| backtest | test_backtest.py | Walk-forward backtesting |
+| scientific | test_scientific_validity.py | Mathematical validity tests |
+| **Total** | **325 tests** | **All passing** |
 
 Run tests:
 ```bash
@@ -211,7 +216,7 @@ Yahoo Finance-based sources (`CryptoDataLoader`, `EquityDataLoader`, `Volatility
 
 ## Requirements
 
-- Python >= 3.8
+- Python >= 3.9
 - numpy >= 1.21.0
 - pandas >= 1.3.0
 - scipy >= 1.7.0

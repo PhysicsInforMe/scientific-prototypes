@@ -149,11 +149,15 @@ class RegimeAnalyzer:
                      for i, c in enumerate(raw_probs.columns)}
         )
 
-        # Current regime is the last observation's regime.
-        current_regime = named_regimes.iloc[-1]
+        # Current regime is determined from the posterior probabilities at
+        # t_last (not from the Viterbi path).  This avoids the pathological
+        # case where Viterbi assigns a state whose marginal posterior is
+        # near-zero, producing a contradictory "regime X at 0% confidence".
+        last_probs = named_probs.iloc[-1]
+        current_regime = str(last_probs.idxmax())
 
-        # Confidence = posterior probability of the current regime at t_last.
-        confidence = float(named_probs[current_regime].iloc[-1])
+        # Confidence = posterior probability of the selected regime at t_last.
+        confidence = float(last_probs.max())
 
         # Days in current regime: count consecutive days at end.
         days_in_regime = self._count_days_in_regime(named_regimes)

@@ -12,7 +12,7 @@ setup(
     description="A comprehensive toolkit for time series analysis and forecasting",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/your-repo/timeseries-toolkit",
+    url="https://github.com/PhysicsInforMe/scientific-prototypes",
     packages=find_packages(exclude=["tests", "notebooks", "examples"]),
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -50,11 +50,19 @@ setup(
             "isort",
             "mypy",
         ],
+        "data": [
+            "yfinance>=0.2.0",
+            "fredapi>=0.5.0",
+            "requests>=2.28.0",
+        ],
         "all": [
             "matplotlib>=3.4.0",
             "seaborn>=0.11.0",
             "lightgbm>=3.0.0",
             "hmmlearn>=0.2.7",
+            "yfinance>=0.2.0",
+            "fredapi>=0.5.0",
+            "requests>=2.28.0",
         ],
     },
 )
