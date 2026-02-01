@@ -2,220 +2,214 @@
 
 **AI-Powered Contract Analysis Using Local LLMs**
 
-Transform your contract review process with an intelligent agent that analyzes legal documents against established compliance frameworks — all running entirely on your infrastructure with zero data exposure to external services.
+A local-first AI agent that analyzes contracts against configurable compliance rules and generates quantitative compliance scores based on established academic and industry frameworks.
+
+> ⚠️ **Disclaimer**: This is a prototype implementation designed for educational and demonstration purposes. It is NOT intended for production use or as a substitute for professional legal review. The compliance scores and analysis provided should be validated by qualified legal professionals before any business decisions.
 
 ---
 
-## The Challenge
+## Table of Contents
 
-Legal and compliance teams face a growing volume of contracts requiring review. Manual analysis is time-consuming, inconsistent, and often misses critical clauses buried in dense legal language. Traditional solutions require sending sensitive documents to cloud services, raising data privacy and confidentiality concerns.
-
-**This agent solves these problems** by providing automated first-pass contract analysis that runs 100% locally, ensuring your confidential agreements never leave your control.
-
----
-
-## What This Agent Does
-
-The Contract Compliance Agent reads your contracts and produces a quantitative compliance assessment based on peer-reviewed academic research and international standards. It answers critical questions like:
-
-- **Are all essential clauses present?** The agent checks for 15+ critical clause categories including termination rights, liability limitations, IP assignment, confidentiality provisions, and more.
-
-- **How complete is each clause?** Beyond simple presence detection, the agent evaluates whether each clause contains the expected elements and language quality.
-
-- **What's the overall risk level?** A weighted scoring system produces an objective compliance score with clear risk categorization (Low/Medium/High).
-
-- **What needs attention?** Prioritized recommendations tell you exactly what to add or improve, ranked by business impact.
+1. [Features](#features)
+2. [Architecture](#architecture)
+3. [Installation](#installation)
+4. [Usage](#usage)
+5. [Configuration](#configuration)
+6. [Scoring Methodology](#scoring-methodology)
+7. [API Reference](#api-reference)
+8. [Testing](#testing)
+9. [Limitations](#limitations)
+10. [References](#references)
 
 ---
 
-## Key Capabilities
+## Features
 
-### Supported Document Formats
-
-The agent processes contracts in multiple formats commonly used in business:
-
-| Format | Extension | Notes |
-|--------|-----------|-------|
-| Plain Text | `.txt` | Fastest processing, ideal for testing |
-| PDF Documents | `.pdf` | Extracts text from standard PDFs (not scanned images) |
-| Word Documents | `.docx` | Full support for modern Word format |
-
-### Clause Categories Analyzed
-
-The default configuration evaluates contracts against 15 critical clause categories, each weighted by legal materiality and business impact:
-
-| Category | Why It Matters |
-|----------|----------------|
-| **Termination Rights** | Ensures you can exit the agreement under defined conditions |
-| **Limitation of Liability** | Caps your exposure and defines damage exclusions |
-| **Intellectual Property** | Clarifies ownership of work products and pre-existing IP |
-| **Indemnification** | Determines who bears responsibility for third-party claims |
-| **Confidentiality** | Protects sensitive information shared during the relationship |
-| **Governing Law** | Establishes which jurisdiction's laws apply |
-| **Payment Terms** | Defines compensation, timing, and currency |
-| **Warranties & Representations** | Documents what each party guarantees |
-| **Force Majeure** | Addresses unforeseeable events beyond parties' control |
-| **Assignment** | Controls whether rights can be transferred to third parties |
-| **Dispute Resolution** | Specifies how conflicts will be resolved |
-| **Non-Compete / Non-Solicit** | Restricts competitive activities |
-| **Data Protection** | Addresses GDPR and privacy compliance |
-| **Insurance Requirements** | Mandates coverage levels and types |
-| **Audit Rights** | Permits verification of compliance |
-
-### Contract Types
-
-While the agent works with any contract, it includes specialized handling for common agreement types:
-
-- **Non-Disclosure Agreements (NDAs)** — Mutual and unilateral confidentiality
-- **Service Agreements** — Professional services and consulting contracts  
-- **Software Licenses** — SaaS, on-premise, and open source licensing
-- **Employment Contracts** — Hiring agreements and contractor arrangements
-- **Vendor Agreements** — Procurement and supply chain contracts
+- **Local-First Architecture**: Runs entirely on your machine using Ollama and open-source LLMs — no data leaves your infrastructure
+- **Quantitative Compliance Scoring**: Based on CUAD benchmark methodology and ISO 37301/37302 frameworks
+- **Multi-Format Support**: Processes PDF, DOCX, and TXT contract files
+- **Multi-Clause Analysis**: Evaluates contracts against 15+ critical clause categories
+- **Risk Categorization**: Traffic-light system (Green/Yellow/Red) with ISO maturity level mapping
+- **Configurable Rules**: YAML-based compliance rules adaptable to organizational requirements
+- **Multiple Output Formats**: JSON, Markdown, and formatted terminal reports
+- **Full Test Suite**: Unit and integration tests for all components
 
 ---
 
-## Compliance Scoring Methodology
+## Architecture
 
-The scoring system isn't arbitrary — it's grounded in peer-reviewed academic research and international compliance standards.
+The agent follows a modular pipeline architecture separating concerns for maintainability and extensibility.
 
-### Academic Foundations
-
-The agent's methodology draws from established legal NLP research:
-
-- **CUAD (Contract Understanding Atticus Dataset)**: A NeurIPS 2021 benchmark comprising 510 contracts with 13,000+ expert annotations across 41 clause categories. Our clause detection approach uses evaluation metrics validated in this research.
-
-- **LexGLUE Benchmark**: An ACL 2022 benchmark for legal language understanding that informs our text analysis approach.
-
-- **ContractNLI**: An EMNLP 2021 dataset for document-level natural language inference in contracts, informing our reasoning about clause implications.
-
-### Industry Standards
-
-Risk levels and maturity assessments align with recognized frameworks:
-
-- **ISO 37301:2021** — International standard for compliance management systems
-- **ISO 37302:2025** — Five-level maturity model for compliance evaluation
-- **NIST Cybersecurity Framework 2.0** — Four-tier implementation model adapted for contract risk
-
-### The Scoring Formula
-
-Each clause receives a composite score based on three factors:
+### High-Level Architecture
 
 ```
-Clause Score = (Presence × 0.3) + (Language Quality × 0.4) + (Completeness × 0.3)
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              CLI Interface                                   │
+│                              (main.py)                                       │
+│         Commands: analyze | status | list-rules | version                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           ComplianceAgent                                    │
+│                           (agent/core.py)                                    │
+│                                                                              │
+│  • Orchestrates the full analysis pipeline                                  │
+│  • Manages configuration and rule loading                                   │
+│  • Provides context manager for resource cleanup                            │
+│  • Exposes high-level analyze() method                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+          ┌─────────────────────────┼─────────────────────────┐
+          │                         │                         │
+          ▼                         ▼                         ▼
+┌───────────────────┐   ┌───────────────────┐   ┌───────────────────┐
+│  DocumentLoader   │   │  ContractAnalyzer │   │  ReportGenerator  │
+│  (tools/)         │   │  (agent/)         │   │  (agent/)         │
+│                   │   │                   │   │                   │
+│ • load_document() │   │ • analyze()       │   │ • to_markdown()   │
+│ • detect_format() │   │ • _extract()      │   │ • to_json()       │
+│ • extract_text()  │   │ • _score()        │   │ • to_terminal()   │
+│                   │   │ • _recommend()    │   │ • to_pdf()        │
+│ Supports:         │   │                   │   │                   │
+│ • PDF (pypdf)     │   │                   │   │                   │
+│ • DOCX (docx)     │   │                   │   │                   │
+│ • TXT (native)    │   │                   │   │                   │
+└───────────────────┘   └───────────────────┘   └───────────────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    │               │               │
+                    ▼               ▼               ▼
+          ┌───────────────┐ ┌─────────────┐ ┌───────────────┐
+          │ClauseExtractor│ │  Scorer     │ │ Recommender   │
+          │(agent/)       │ │ (agent/)    │ │ (agent/)      │
+          │               │ │             │ │               │
+          │• extract()    │ │• presence() │ │• generate()   │
+          │• prefilter()  │ │• similarity()│ │• prioritize() │
+          │• parse_json() │ │• complete() │ │               │
+          └───────────────┘ └─────────────┘ └───────────────┘
+                    │
+                    ▼
+          ┌───────────────────┐
+          │   OllamaClient    │
+          │   (tools/)        │
+          │                   │
+          │ • generate()      │
+          │ • check_status()  │
+          │ • list_models()   │
+          │                   │
+          │ Retry logic:      │
+          │ • 3 attempts      │
+          │ • Exp. backoff    │
+          └───────────────────┘
+                    │
+                    ▼
+          ┌───────────────────┐
+          │   Ollama Server   │
+          │   (localhost)     │
+          │                   │
+          │ Models:           │
+          │ • llama3.1:8b     │
+          │ • qwen2.5:7b      │
+          │ • phi3:mini       │
+          └───────────────────┘
 ```
 
-The document-level score aggregates clause scores weighted by legal materiality:
+### Component Responsibilities
+
+#### `ComplianceAgent` (agent/core.py)
+The main orchestrator that coordinates all components. Implements context manager protocol for proper resource management.
+
+```python
+with ComplianceAgent(model="llama3.1:8b", verbose=True) as agent:
+    result = agent.analyze("contract.pdf")
+```
+
+#### `ContractAnalyzer` (agent/analyzer.py)
+Executes the analysis pipeline for a single contract:
+1. Iterates through configured clause rules
+2. Calls ClauseExtractor for each clause
+3. Calculates presence, similarity, and completeness scores
+4. Aggregates into document-level compliance score
+5. Generates prioritized recommendations
+
+#### `ClauseExtractor` (agent/extractor.py)
+Extracts clause information using a two-stage approach:
+1. **Keyword Pre-Filter**: Fast heuristic to identify likely clause locations
+2. **LLM Extraction**: Structured extraction with JSON output parsing
+
+#### `ComplianceScorer` (agent/scorer.py)
+Implements the scoring methodology:
+- Clause-level composite scoring
+- Weighted document aggregation
+- Risk level classification
+- ISO maturity mapping
+
+#### `OllamaClient` (tools/llm_client.py)
+Handles all LLM interactions:
+- Connection management
+- Request/response handling
+- Retry logic with exponential backoff
+- Model availability checking
+
+### Data Flow
 
 ```
-Document Score = Σ(clause_score × clause_weight) / Σ(clause_weight)
-```
-
-Risk classification follows industry-standard thresholds:
-
-| Score Range | Risk Level | What It Means |
-|-------------|------------|---------------|
-| ≥ 0.70 | 🟢 **Low Risk** | Contract meets compliance expectations |
-| 0.40 – 0.69 | 🟡 **Medium Risk** | Notable gaps requiring attention |
-| < 0.40 | 🔴 **High Risk** | Critical clauses missing or deficient |
-
----
-
-## Use Cases
-
-### Pre-Signature Review
-
-Before signing a new vendor contract, run it through the agent to identify missing protections or unusual terms that warrant negotiation.
-
-### Portfolio Audit
-
-Analyze your existing contract portfolio to identify agreements with compliance gaps, prioritizing which need renegotiation.
-
-### Template Validation
-
-Test your contract templates against best practices to ensure they include all necessary protections before sending to counterparties.
-
-### Due Diligence Support
-
-During M&A or investment due diligence, quickly assess the quality of target company contracts.
-
-### Training & Education
-
-Use the detailed clause-by-clause analysis to train junior legal staff on what to look for in contract review.
-
----
-
-## Sample Analysis Output
-
-```
-═══════════════════════════════════════════════════════════════════════════════
-                    CONTRACT COMPLIANCE ANALYSIS REPORT
-═══════════════════════════════════════════════════════════════════════════════
-
-Document: vendor_services_agreement.pdf
-Analysis Date: 2025-01-12
-Processing Time: 45.2 seconds
-
-───────────────────────────────────────────────────────────────────────────────
-                              EXECUTIVE SUMMARY
-───────────────────────────────────────────────────────────────────────────────
-
-Overall Compliance Score: 0.68 / 1.00
-Risk Level: 🟡 MEDIUM RISK
-ISO 37302 Maturity: Level 3 (Established)
-
-Clauses Analyzed: 15
-Clauses Present: 12
-Clauses Partial: 2
-Clauses Missing: 1
-
-───────────────────────────────────────────────────────────────────────────────
-                              CLAUSE ANALYSIS
-───────────────────────────────────────────────────────────────────────────────
-
-✅ Confidentiality Obligations          Score: 0.92  [LOW RISK]
-   Well-defined mutual confidentiality with appropriate carve-outs
-   
-✅ Term and Termination                 Score: 0.88  [LOW RISK]
-   Clear 12-month initial term with 30-day termination notice
-
-✅ Governing Law                        Score: 0.85  [LOW RISK]
-   Delaware law specified with exclusive jurisdiction
-
-⚠️  Limitation of Liability             Score: 0.58  [MEDIUM RISK]
-   Issue: No aggregate liability cap specified
-   Found: Consequential damages exclusion present
-
-⚠️  Indemnification                     Score: 0.52  [MEDIUM RISK]
-   Issue: One-sided indemnification (vendor only)
-   Missing: Mutual indemnification for respective breaches
-
-❌ Intellectual Property                Score: 0.31  [HIGH RISK]
-   Missing: Work product ownership assignment
-   Missing: Pre-existing IP carve-out
-   Missing: License grant for background IP
-
-───────────────────────────────────────────────────────────────────────────────
-                         PRIORITIZED RECOMMENDATIONS
-───────────────────────────────────────────────────────────────────────────────
-
-1. [HIGH PRIORITY] Add IP assignment clause
-   Action: Draft work-for-hire provision with clear ownership transfer
-   Impact: Prevents disputes over deliverable ownership
-
-2. [MEDIUM PRIORITY] Add liability cap
-   Action: Negotiate aggregate cap (typically 12 months fees)
-   Impact: Limits maximum exposure in case of breach
-
-3. [MEDIUM PRIORITY] Balance indemnification
-   Action: Add mutual indemnification for respective breaches
-   Impact: Fair risk allocation between parties
-
-═══════════════════════════════════════════════════════════════════════════════
+Contract File
+     │
+     ▼
+┌─────────────┐
+│ Load & Parse │ ──► DocumentMetadata (filename, size, format, pages)
+└─────────────┘
+     │
+     ▼
+Contract Text (string)
+     │
+     ▼
+┌─────────────────────────────────────────────┐
+│         For each ClauseRule:                │
+│  ┌─────────────┐    ┌──────────────────┐   │
+│  │  Pre-filter │ ─► │  LLM Extraction  │   │
+│  └─────────────┘    └──────────────────┘   │
+│         │                    │              │
+│         ▼                    ▼              │
+│    Candidate         ClauseExtraction       │
+│    Sections          (text, elements,       │
+│                       confidence)           │
+└─────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────┐
+│              Score Calculation               │
+│                                              │
+│  presence_score = f(status, confidence)     │
+│  similarity_score = LLM_eval(text, rule)    │
+│  completeness_score = found / (found+miss)  │
+│                                              │
+│  clause_score = 0.3×P + 0.4×S + 0.3×C       │
+└─────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────┐
+│           Document Aggregation               │
+│                                              │
+│  doc_score = Σ(clause×weight) / Σ(weight)   │
+│  risk_level = classify(doc_score)           │
+│  maturity = map_to_iso(doc_score)           │
+└─────────────────────────────────────────────┘
+     │
+     ▼
+AnalysisResult
+     │
+     ▼
+┌─────────────────┐
+│ Report Output   │ ──► Markdown / JSON / Terminal / PDF
+└─────────────────┘
 ```
 
 ---
 
-## Technical Requirements
+## Installation
 
 ### What You Need
 
@@ -226,90 +220,365 @@ Clauses Missing: 1
 | **RAM** | Minimum 8GB, recommended 16GB |
 | **Storage** | 10GB free for models |
 | **GPU (Optional)** | NVIDIA GPU with 8GB+ VRAM for faster processing |
+| **Ollama** | installed and running
 
-### Local LLM Support
+### Step 1: Install Ollama
 
-The agent uses [Ollama](https://ollama.ai) to run open-source language models locally. Recommended models:
+```bash
+# Linux/macOS
+curl -fsSL https://ollama.ai/install.sh | sh
 
-| Model | Size | Best For |
-|-------|------|----------|
-| `llama3.1:8b` | 4.7 GB | Balanced performance and quality |
-| `qwen2.5:7b` | 4.4 GB | Strong multilingual support |
-| `phi3:mini` | 2.3 GB | Resource-constrained systems |
-| `llama3.1:70b` | 40 GB | Maximum accuracy (requires 48GB+ VRAM) |
+# Windows: Download from https://ollama.ai/download
+```
+
+### Step 2: Pull a Model
+
+```bash
+# Recommended for most systems
+ollama pull llama3.1:8b
+
+# Alternative options
+ollama pull qwen2.5:7b    # Better multilingual support
+ollama pull phi3:mini      # For resource-constrained systems
+```
+
+### Step 3: Setup the Project
+
+```bash
+# Navigate to the project directory
+cd compliance-agent
+
+# Create virtual environment
+python -m venv .venv
+
+# Activate (Linux/macOS)
+source .venv/bin/activate
+
+# Activate (Windows CMD)
+.venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Step 4: Verify Installation
+
+```bash
+# Check Ollama status
+python main.py status
+
+# Run a test analysis
+python main.py analyze -c samples/nda_sample.txt -v -m qwen2.5:3b
+```
 
 ---
 
-## Privacy & Security
+## Usage
 
-**Your contracts never leave your machine.** Unlike cloud-based contract analysis tools, this agent:
+### Command Line Interface
 
-- Runs entirely on your local infrastructure
-- Requires no internet connection after initial setup
-- Sends zero data to external APIs or services
-- Keeps all analysis results on your local storage
+The agent provides a CLI with multiple commands:
 
-This makes it suitable for analyzing highly confidential agreements where data residency and privacy are paramount.
+```bash
+# Analyze a contract
+python main.py analyze --contract path/to/contract.pdf
+
+# Short form with options
+python main.py analyze -c contract.docx -o report.md -v -m llama3.1:8b
+
+# Check Ollama status
+python main.py status
+
+# List available compliance rules
+python main.py list-rules
+
+# Show version
+python main.py version
+```
+
+### CLI Options for `analyze`
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--contract` | `-c` | Path to contract file (required) | — |
+| `--output` | `-o` | Output file path | Terminal |
+| `--model` | `-m` | Ollama model to use | `llama3.1:8b` |
+| `--format` | `-f` | Output format: markdown, json, text | `markdown` |
+| `--rules` | `-r` | Custom rules YAML file | Default rules |
+| `--type` | `-t` | Contract type hint | `general` |
+| `--verbose` | `-v` | Enable verbose output | `False` |
+
+### Python API
+
+```python
+from agent import ComplianceAgent
+
+# Basic usage
+with ComplianceAgent(model="qwen2.5:3b") as agent:
+    result = agent.analyze("contract.pdf")
+    print(f"Score: {result.compliance_score.overall_score:.2f}")
+    print(f"Risk: {result.compliance_score.risk_level.value}")
+
+# With custom configuration
+from config import load_rules
+
+rules = load_rules("my_rules.yaml")
+with ComplianceAgent(model="llama3.1:8b", rules=rules, verbose=True) as agent:
+    result = agent.analyze(
+        "contract.docx",
+        contract_type=ContractType.SERVICE_AGREEMENT
+    )
+    agent.save_report(result, "report.md", format="markdown")
+```
+
+### Batch Processing
+
+```python
+from pathlib import Path
+from agent import ComplianceAgent
+
+with ComplianceAgent() as agent:
+    results = []
+    for contract in Path("contracts/").glob("*.pdf"):
+        result = agent.analyze(contract)
+        results.append({
+            "file": contract.name,
+            "score": result.compliance_score.overall_score,
+            "risk": result.compliance_score.risk_level.value
+        })
+    
+    # Sort by risk level
+    high_risk = [r for r in results if r["risk"] == "high"]
+    print(f"Found {len(high_risk)} high-risk contracts")
+```
+
+---
+
+## Configuration
+
+### Compliance Rules (`config/default_rules.yaml`)
+
+Rules define what clauses to look for and how to evaluate them:
+
+```yaml
+clauses:
+  - id: "termination"
+    name: "Termination Rights"
+    description: "Conditions under which parties can terminate the agreement"
+    required: true
+    risk_if_missing: "high"
+    keywords:
+      - "termination"
+      - "terminate"
+      - "cancellation"
+      - "end of agreement"
+    expected_elements:
+      - "termination for cause"
+      - "termination for convenience"
+      - "notice period"
+      - "effect of termination"
+
+  - id: "liability"
+    name: "Limitation of Liability"
+    description: "Caps on liability and damage exclusions"
+    required: true
+    risk_if_missing: "high"
+    keywords:
+      - "limitation of liability"
+      - "liability cap"
+      - "damages"
+      - "liable"
+    expected_elements:
+      - "aggregate cap"
+      - "exclusion of consequential damages"
+      - "carve-outs"
+```
+
+### Clause Weights (`config/clause_weights.yaml`)
+
+Weights determine relative importance in the overall score:
+
+```yaml
+weights:
+  termination: 0.95
+  ip_assignment: 0.90
+  liability: 0.90
+  indemnification: 0.85
+  confidentiality: 0.80
+  governing_law: 0.75
+  payment_terms: 0.70
+  warranties: 0.65
+  force_majeure: 0.60
+  assignment: 0.55
+```
+
+### Settings (`config/settings.py`)
+
+Global configuration options:
+
+```python
+OLLAMA_BASE_URL = "http://localhost:11434"
+OLLAMA_TIMEOUT = 120  # seconds
+DEFAULT_MODEL = "llama3.1:8b"
+MAX_RETRIES = 3
+RETRY_BACKOFF = 2.0
+
+# Scoring thresholds
+RISK_THRESHOLD_HIGH = 0.40
+RISK_THRESHOLD_MEDIUM = 0.70
+
+# Output settings
+DEFAULT_OUTPUT_FORMAT = "markdown"
+```
+
+---
+
+## Scoring Methodology
+
+### Academic Foundations
+
+The scoring system is grounded in peer-reviewed research:
+
+- **CUAD (NeurIPS 2021)**: Contract Understanding Atticus Dataset with 41 clause categories
+- **LexGLUE (ACL 2022)**: Legal language understanding benchmark
+- **ContractNLI (EMNLP 2021)**: Document-level inference for contracts
+
+### Industry Frameworks
+
+- **ISO 37301:2021**: Compliance management systems requirements
+- **ISO 37302:2025**: Five-level maturity model
+- **NIST CSF 2.0**: Four-tier implementation model
+
+### Scoring Formula
+
+**Clause-Level Score:**
+```
+clause_score = (presence × 0.3) + (similarity × 0.4) + (completeness × 0.3)
+```
+
+Where:
+- `presence`: Detection confidence (0-1)
+- `similarity`: Language quality assessment (0-1)
+- `completeness`: found_elements / total_expected (0-1)
+
+**Document-Level Score:**
+```
+doc_score = Σ(clause_score × clause_weight) / Σ(clause_weight)
+```
+
+**Risk Classification:**
+| Score | Level | ISO 37302 Maturity |
+|-------|-------|-------------------|
+| ≥ 0.70 | Low | Level 4-5 (Advanced/Optimized) |
+| 0.40-0.69 | Medium | Level 2-3 (Developing/Established) |
+| < 0.40 | High | Level 1 (Basic) |
+
+---
+
+## Project Structure
+
+```
+compliance-agent/
+├── agent/
+│   ├── __init__.py           # Package exports, version
+│   ├── core.py               # ComplianceAgent main class
+│   ├── analyzer.py           # ContractAnalyzer pipeline
+│   ├── extractor.py          # ClauseExtractor + KeywordPreFilter
+│   ├── scorer.py             # ComplianceScorer + risk mapping
+│   └── reporter.py           # ReportGenerator (md/json/terminal)
+├── config/
+│   ├── __init__.py           # Config loading utilities
+│   ├── settings.py           # Global settings
+│   ├── default_rules.yaml    # Default clause rules
+│   └── clause_weights.yaml   # Clause importance weights
+├── models/
+│   ├── __init__.py           # Model exports
+│   └── schemas.py            # Pydantic models (20+ types)
+├── tools/
+│   ├── __init__.py           # Tool exports
+│   ├── document_loader.py    # PDF/DOCX/TXT parsing
+│   └── llm_client.py         # OllamaClient with retry logic
+├── tests/
+│   ├── __init__.py
+│   ├── test_scorer.py        # Scorer unit tests
+│   └── test_integration.py   # End-to-end tests
+├── samples/
+│   ├── nda_sample.txt        # Sample NDA (complete)
+│   └── service_agreement.txt # Sample service agreement (incomplete)
+├── main.py                   # CLI entry point (Typer)
+├── requirements.txt          # Python dependencies
+├── LICENSE                   # MIT License
+└── README.md                 # This file
+```
+
+---
+
+## Testing
+
+### Run All Tests
+
+```bash
+# Basic test run
+pytest tests/ -v
+
+# With coverage report
+pytest tests/ --cov=agent --cov-report=html
+
+# Run only unit tests (no Ollama required)
+pytest tests/test_scorer.py -v
+
+# Run integration tests (requires Ollama)
+pytest tests/test_integration.py -v
+```
+
+### Test Coverage Targets
+
+| Module | Target | Notes |
+|--------|--------|-------|
+| `scorer.py` | 90%+ | Pure logic, fully testable |
+| `extractor.py` | 80%+ | Mocked LLM responses |
+| `analyzer.py` | 75%+ | Integration with mocks |
+| `core.py` | 70%+ | Orchestration logic |
 
 ---
 
 ## Limitations
 
-This is a prototype implementation with intentional constraints:
-
-- **Not a substitute for legal review**: Results should be validated by qualified legal professionals
-- **English language optimized**: Best performance with English-language contracts
-- **Text-based PDFs only**: Cannot process scanned documents or images (no OCR)
-- **Model-dependent quality**: Analysis quality varies with the chosen LLM
-
----
-
-## Request Access
-
-This repository contains proprietary implementation code. Source code access is available upon request for:
-
-- **Enterprise Evaluation** — Test the agent with your own contracts
-- **Academic Research** — Extend the methodology for research purposes
-- **Consulting Engagements** — Custom implementation for your organization
-
-### How to Get Access
-
-1. Visit [luigisimeone.com](https://luigisimeone.com/#projects)
-2. Complete the access request form
-3. Describe your intended use case
-4. Receive repository access within 24-48 hours if approved
-
----
-
-## Author
-
-**Luigi Simeone, PhD** — Technology Executive & Applied Researcher with 12+ years bridging theoretical research and enterprise AI systems. Two pending US patents on multi-agent architectures. Specialized in Physics-Informed ML, Agentic AI, and AI Governance.
-
-- [luigisimeone.com](https://luigisimeone.com)
-- [LinkedIn](https://linkedin.com/in/luigi-simeone-2a688150)
+1. **Prototype Status**: Designed for demonstration and learning, not production
+2. **Model Dependent**: Analysis quality varies with LLM capability
+3. **English Optimized**: Best performance with English-language contracts
+4. **Text-Based PDFs**: No OCR for scanned documents
+5. **No Legal Advice**: Cannot replace professional legal review
 
 ---
 
 ## References
 
-1. Hendrycks, D., et al. (2021). "CUAD: An Expert-Annotated NLP Dataset for Legal Contract Review." *NeurIPS Datasets and Benchmarks Track*.
+1. Hendrycks, D., et al. (2021). "CUAD: An Expert-Annotated NLP Dataset for Legal Contract Review." *NeurIPS Datasets and Benchmarks*.
 
-2. Chalkidis, I., et al. (2022). "LexGLUE: A Benchmark Dataset for Legal Language Understanding in English." *ACL 2022*.
+2. Chalkidis, I., et al. (2022). "LexGLUE: A Benchmark Dataset for Legal Language Understanding in English." *ACL*.
 
 3. ISO 37301:2021. "Compliance management systems — Requirements with guidance for use."
 
 4. ISO 37302:2025. "Compliance management systems — Guidelines on managing compliance and supporting ethics."
 
-5. Koreeda, Y., & Manning, C. D. (2021). "ContractNLI: A Dataset for Document-level Natural Language Inference for Contracts." *EMNLP 2021*.
+5. Koreeda, Y., & Manning, C. D. (2021). "ContractNLI: A Dataset for Document-level Natural Language Inference for Contracts." *EMNLP*.
 
 ---
 
 ## License
 
-**Documentation**: MIT License
-
-**Source Code**: Proprietary — Available upon approved request through my website
+MIT License — See [LICENSE](LICENSE) for details.
 
 ---
 
-*This prototype demonstrates practical agentic AI implementation for contract compliance analysis. It is designed for educational and demonstration purposes and should not replace professional legal review.*
+## Author
+
+**Luigi Simeone** is an AI Consultant and Chief Scientist specializing in mathematical modelling, machine learning, multi-agent architectures, and enterprise AI governance. With 12+ years of experience in AI innovation across AI Consulting, FinTech, Asset Management, and RegTech, he bridges theoretical research with practical enterprise implementation.
+
+- **Website**: [luigisimeone.com](https://luigisimeone.com)
+- **LinkedIn**: [linkedin.com/in/luigi-simeone](https://linkedin.com/in/luigi-simeone)
+
+---
+
+*For production deployments, enterprise customization, or consulting engagements, please reach out directly.*
