@@ -91,6 +91,8 @@ This finding is not specific to our implementation. Meese and Rogoff (1983) demo
 
 The result is consistent with the weak-form Efficient Market Hypothesis: if past prices contained exploitable information for predicting future prices, rational agents would trade on that information until the predictability disappeared.
 
+**Important scope limitation:** Meese-Rogoff applies specifically to models that use only the asset's own price history (univariate models). The result does not preclude predictability from *external* information sources — cross-asset signals, alternative data, or macroeconomic surprises — that are not yet fully incorporated into the current price. This distinction is critical for understanding which improvements in Section 5 can realistically beat the naive baseline and which can only reduce the gap.
+
 ### 3.3 The Tuning Cause (15%)
 
 Within the structural constraint of a univariate Kalman filter on prices, some parameter choices are suboptimal:
@@ -128,6 +130,15 @@ For a risk management or portfolio monitoring use case, these auxiliary outputs 
 ## 5. Proposed Mathematical Improvements
 
 The following improvements address the structural 85% cause. They are ordered by expected impact and feasibility. None require changes to the existing codebase — they represent architectural extensions for future development.
+
+**Critical distinction — two categories of improvements:**
+
+| Category | Improvements | Can beat naive? | Rationale |
+|----------|--------------|-----------------|-----------|
+| **Structural** | 5.1, 5.3, 5.6 | No — can only reduce the gap | These improve model formulation but still use only the asset's own price history. Meese-Rogoff applies. |
+| **Informational** | 5.2, 5.4, 5.5 | Potentially yes | These change the information set by adding external signals (5.2), combining diverse models (5.4), or incorporating engineered features from multiple sources (5.5). |
+
+The structural improvements make the model mathematically sounder but cannot overcome the fundamental lack of predictive signal in univariate price history. Only the informational improvements have a theoretical basis for outperforming the naive baseline.
 
 ### 5.1 Forecast Returns, Not Prices
 
@@ -270,35 +281,60 @@ Use features measured at the same weekly frequency: weekly returns, weekly volum
 
 ## 6. Improvement Priority Matrix
 
-| # | Improvement | Impact | Feasibility | Dependencies |
-|---|-------------|--------|-------------|-------------|
-| 5.2 | Exogenous predictors | High | Medium | Data sources module extension |
-| 5.4 | Ensemble averaging | Medium-High | High | No new dependencies |
-| 5.1 | Forecast returns, not prices | Medium | High | Minor pipeline refactor |
-| 5.5 | LightGBM integration | Variable | Medium | Feature engineering module |
-| 5.3 | Regime-conditional models | Medium | Medium | Kim filter or per-regime fitting |
-| 5.6 | Natural frequency forecasting | Medium | High | Aggregation logic |
+| # | Improvement | Category | Impact | Feasibility | Dependencies |
+|---|-------------|----------|--------|-------------|-------------|
+| 5.2 | Exogenous predictors | Informational | High | Medium | Data sources module extension |
+| 5.4 | Ensemble averaging | Informational | Medium-High | High | No new dependencies |
+| 5.1 | Forecast returns, not prices | Structural | Low-Medium | High | Minor pipeline refactor |
+| 5.5 | LightGBM integration | Informational* | Variable | Medium | Feature engineering module |
+| 5.3 | Regime-conditional models | Structural | Low-Medium | Medium | Kim filter or per-regime fitting |
+| 5.6 | Natural frequency forecasting | Structural | Low | High | Aggregation logic |
+
+*5.5 is informational only if features include external data sources; with lag-only features it is effectively structural.
 
 The recommended implementation order is: **5.1 → 5.4 → 5.2 → 5.5 → 5.3 → 5.6**.
 
-Rationale: Start with the simplest high-impact changes (forecast returns instead of prices, combine existing pipelines via ensemble), then add exogenous data and ML integration, and finally implement the more complex regime-conditional and multi-frequency approaches.
+Rationale: Start with 5.1 (forecast returns) as a foundational fix that enables proper use of preprocessing modules. Then implement 5.4 (ensemble) which can reduce variance without new data. Add 5.2 (exogenous predictors) for the highest-impact informational improvement. Finally, 5.5/5.3/5.6 provide incremental gains. Note that only 5.2, 5.4, and 5.5-with-external-features have realistic potential to beat the naive baseline.
 
 ---
 
 ## 7. What Success Looks Like
 
-After implementing the improvements above, realistic target metrics for the BTC-USD 7-day backtest would be:
+Realistic expectations depend on which category of improvements is implemented:
 
-| Metric | Current MI | Current Naive | Target MI |
-|--------|-----------|---------------|-----------|
-| MAE | $4,499 | $3,896 | $3,500–3,800 |
-| MAPE | 4.20% | 3.64% | 3.0–3.5% |
+### 7.1 Structural Improvements Only (5.1, 5.3, 5.6)
+
+These improvements fix mathematical issues but do not add new predictive information. They **cannot beat the naive baseline** — the goal is only to reduce the gap:
+
+| Metric | Current MI | Current Naive | Target MI (Structural) |
+|--------|-----------|---------------|------------------------|
+| MAE | $4,499 | $3,896 | $4,000–4,200 |
+| MAPE | 4.20% | 3.64% | 3.8–4.0% |
+| Directional Accuracy | 28.6% | 0% | 40–50% |
+| Coverage (95% CI) | 100% | 100% | 92–98% |
+
+With structural improvements alone, the system will still underperform naive on point accuracy. The value lies in better-calibrated uncertainty and improved directional accuracy (approaching coin-flip).
+
+### 7.2 Informational Improvements (5.2, 5.4, 5.5 with external features)
+
+These improvements change the information set and have theoretical potential to match or beat naive:
+
+| Metric | Current MI | Current Naive | Target MI (Informational) |
+|--------|-----------|---------------|---------------------------|
+| MAE | $4,499 | $3,896 | $3,600–4,000 |
+| MAPE | 4.20% | 3.64% | 3.4–3.8% |
 | Directional Accuracy | 28.6% | 0% | 52–58% |
 | Coverage (95% CI) | 100% | 100% | 90–97% |
 
-These targets are deliberately conservative. Beating naive by more than 10–15% on liquid daily assets would require either proprietary signals or higher-frequency data. The real improvement should come from directional accuracy (currently below coin-flip at 35.7%) and from maintaining properly calibrated confidence intervals.
+Even with informational improvements, expectations should remain modest. Beating naive by more than 5–10% on liquid daily assets is difficult without proprietary signals or higher-frequency data. The primary value of informational improvements is:
 
-A directional accuracy of 52–58% may seem modest, but in financial markets a consistent 55% hit rate with proper risk management is commercially significant.
+1. **Directional accuracy above 50%** — a consistent 55% hit rate with proper risk management is commercially significant
+2. **Reduced variance through ensemble averaging** — even if the mean error is similar to naive, lower variance means more reliable forecasts
+3. **Conditional outperformance** — the system may beat naive in specific regimes (e.g., trending markets) while underperforming in others (e.g., mean-reverting sideways markets)
+
+### 7.3 Combined Implementation
+
+Implementing both categories together yields the best results, but the marginal contribution of structural improvements is small once informational improvements are in place. Prioritize 5.2 (exogenous predictors) and 5.4 (ensemble) for maximum impact.
 
 ---
 
